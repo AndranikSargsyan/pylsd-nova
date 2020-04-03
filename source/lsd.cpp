@@ -74,7 +74,7 @@
 #include <math.h>
 #include <limits.h>
 #include <float.h>
-#include <lsd.h>
+#include "lsd.h"
 
 /** ln(10) */
 #ifndef M_LN10
@@ -2055,22 +2055,34 @@ ntuple_list LineSegmentDetection( image_double image, double scale,
 /*----------------------------------------------------------------------------*/
 /** LSD Simple Interface with Scale.
  */
-ntuple_list lsd_scale(image_double image, double scale)
+ntuple_list lsd_scale(image_double image, double scale, double sigma_scale,
+                      double ang_th, double quant, double eps,
+                      double density_th, int n_bins, double max_grad)
 {
-    /* LSD parameters */
-    double sigma_scale = 0.6; /* Sigma for Gaussian filter is computed as
-                                sigma = sigma_scale/scale.                    */
-    double quant = 2.0;       /* Bound to the quantization error on the
-                                gradient norm.                                */
-    double ang_th = 22.5;     /* Gradient angle tolerance in degrees.           */
-    double eps = 0.0;         /* Detection threshold, -log10(NFA).              */
-    double density_th = 0.7;  /* Minimal density of region points in rectangle. */
-    int n_bins = 1024;        /* Number of bins in pseudo-ordering of gradient
-                               modulus.                                       */
-    double max_grad = 255.0;  /* Gradient modulus in the highest bin. The
+   
+   /* LSD parameters
+    double scale = 0.8;        Scale the image by Gaussian filter to 'scale'.
+
+    double sigma_scale = 0.6;  Sigma for Gaussian filter is computed as
+                               sigma = sigma_scale/scale.                    
+   
+
+    double quant = 2.0;        Bound to the quantization error on the
+                               gradient norm.  
+                              
+    double ang_th = 22.5;      Gradient angle tolerance in degrees.           
+
+    double eps = 0.0;          Detection threshold, -log10(NFA).              
+
+    double density_th = 0.7;   Minimal density of region points in rectangle.
+
+    int n_bins = 1024;         Number of bins in pseudo-ordering of gradient
+                               modulus.                                       
+
+    double max_grad = 255.0;   Gradient modulus in the highest bin. The
                                default value corresponds to the highest
                                gradient modulus on images with gray
-                               levels in [0,255].                             */
+                               levels in [0,255]. */
 
     return LineSegmentDetection( image, scale, sigma_scale, quant, ang_th, eps,
                                  density_th, n_bins, max_grad, NULL );
@@ -2079,14 +2091,6 @@ ntuple_list lsd_scale(image_double image, double scale)
 /*----------------------------------------------------------------------------*/
 /** LSD Simple Interface.
  */
-ntuple_list lsd(image_double image)
-{
-    /* LSD parameters */
-    double scale = 0.8;       /* Scale the image by Gaussian filter to 'scale'. */
-
-    return lsd_scale(image, scale);
-}
-/*----------------------------------------------------------------------------*/
 
 void writeNtl(ntuple_list ntl, char* file)
 {
@@ -2105,10 +2109,13 @@ void writeNtl(ntuple_list ntl, char* file)
     fclose(fp);
 }
 
-void lsdGet(double* src, int rows, int cols, char* file) {
+void lsdGet(double* src, int rows, int cols, char* file, double scale,
+            double sigma_scale, double ang_th, double quant, double eps,
+            double density_th, int n_bins, double max_grad) {
     image_double image = new_image_double(cols, rows);
     image->data = src;
-    ntuple_list ntl = lsd(image);
+    ntuple_list ntl = lsd_scale(image, scale, sigma_scale, ang_th, quant, eps,
+                      density_th, n_bins, max_grad);
     writeNtl(ntl, file);
     free_ntuple_list(ntl);
 }
