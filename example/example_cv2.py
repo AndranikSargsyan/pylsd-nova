@@ -1,25 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2015-12-19 02:09:53
-# @Author  : Gefu Tang (tanggefu@gmail.com)
-# @Link    : https://github.com/primetang/pylsd
-# @Version : 0.0.1
 
 import cv2
 import numpy as np
 import os
-from pylsd.lsd import lsd
+from pylsd import lsd
 
-fullName = 'car.jpg'
-folder, imgName = os.path.split(fullName)
-src = cv2.imread(fullName, cv2.IMREAD_COLOR)
-gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-lines = lsd(gray)
+full_name = 'car.jpg'
+folder, img_name = os.path.split(full_name)
+img = cv2.imread(full_name, cv2.IMREAD_COLOR)
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-for i in range(lines.shape[0]):
-    pt1 = (int(lines[i, 0]), int(lines[i, 1]))
-    pt2 = (int(lines[i, 2]), int(lines[i, 3]))
-    width = lines[i, 4]
-    cv2.line(src, pt1, pt2, (0, 0, 255), int(np.ceil(width / 2)))
+segments = lsd(img_gray)
 
-cv2.imwrite(os.path.join(folder, 'cv2_' + imgName.split('.')[0] + '.jpg'), src)
+for i in range(segments.shape[0]):
+    pt1 = (int(segments[i, 0]), int(segments[i, 1]))
+    pt2 = (int(segments[i, 2]), int(segments[i, 3]))
+    width = segments[i, 4]
+    cv2.line(img, pt1, pt2, (0, 0, 255), int(np.ceil(width / 2)))
+
+cv2.imwrite(os.path.join(folder, 'cv2_' + img_name.split('.')[0] + '.jpg'), img)

@@ -9,47 +9,55 @@ from tempfile import NamedTemporaryFile
 
 from .bindings.lsd_ctypes import lsdlib
 
-def lsd(src,
-        scale=0.8,
-        sigma_scale=0.6,
-        ang_th=22.5,
-        quant=2.0,
-        eps=0.0,
-        density_th=0.7,
-        n_bins=1024,
-        max_grad=255.0
-    ):
-    """ LSD parameters
-    scale (float)        Scale the image by Gaussian filter to 'scale'.
 
-    sigma_scale (float)  Sigma for Gaussian filter is computed as
-                         sigma = sigma_scale/scale.
+def lsd(
+    img,
+    scale=0.8,
+    sigma_scale=0.6,
+    ang_th=22.5,
+    quant=2.0,
+    eps=0.0,
+    density_th=0.7,
+    n_bins=1024,
+    max_grad=255.0
+):
+    """Detects line segments in the provided image.
 
-    quant (float)        Bound to the quantization error on the gradient norm.
+    Args:
+        img (numpy.ndarray): Grayscale image.
 
-    ang_th (float)       Gradient angle tolerance in degrees.
+        scale (float): Scale the image by Gaussian filter to 'scale'.
 
-    eps (float)          Detection threshold, -log10(NFA).
+        sigma_scale (float):Sigma for Gaussian filter is computed as sigma = sigma_scale/scale.
 
-    density_th (float)   Minimal density of region points in rectangle.
+        quant (float): Bound to the quantization error on the gradient norm.
 
-    n_bins (int)         Number of bins in pseudo-ordering of gradient modulus.
+        ang_th (float): Gradient angle tolerance in degrees.
 
-    max_grad (float)     Gradient modulus in the highest bin. The
-                         default value corresponds to the highest
-                         gradient modulus on images with gray levels in [0,255].
+        eps (float): Detection threshold, -log10(NFA).
+
+        density_th (float): Minimal density of region points in rectangle.
+
+        n_bins (int): Number of bins in pseudo-ordering of gradient modulus.
+
+        max_grad (float): Gradient modulus in the highest bin. The default value corresponds to
+            the highest gradient modulus on images with gray levels in [0,255].
+
+    Returns:
+        (2D numpy.ndarray): Detected line segments in format:
+            [[point1.x, point1.y, point2.x, point2.y, width]]
     """
-    rows, cols = src.shape
-    src = src.reshape(1, rows * cols).tolist()[0]
+    rows, cols = img.shape
+    img = img.reshape(1, rows * cols).tolist()[0]
 
-    lens = len(src)
-    src = (ctypes.c_double * lens)(*src)
+    lens = len(img)
+    img = (ctypes.c_double * lens)(*img)
 
     with NamedTemporaryFile(prefix='pylsd-', suffix='.ntl.txt', delete=False) as fp:
         fname = fp.name
         fname_bytes = bytes(fp.name) if sys.version_info < (3, 0) else bytes(fp.name, 'utf8')
 
-    lsdlib.lsdGet(src, ctypes.c_int(rows), ctypes.c_int(cols), fname_bytes,
+    lsdlib.lsdGet(img, ctypes.c_int(rows), ctypes.c_int(cols), fname_bytes,
                  ctypes.c_double(scale), ctypes.c_double(sigma_scale),
                  ctypes.c_double(ang_th), ctypes.c_double(quant), ctypes.c_double(eps),
                  ctypes.c_double(density_th), ctypes.c_int(n_bins), ctypes.c_double(max_grad))
@@ -59,9 +67,9 @@ def lsd(src,
         cnt = output.strip().split(' ')
         count = int(cnt[0])
         dim = int(cnt[1])
-        lines = np.array([float(each) for each in cnt[2:]])
-        lines = lines.reshape(count, dim)
+        segments = np.array([float(each) for each in cnt[2:]])
+        segments = segments.reshape(count, dim)
 
     os.remove(fname)
-    return lines
+    return segments
 

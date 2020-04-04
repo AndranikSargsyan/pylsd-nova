@@ -1,1 +1,4 @@
-*/build/*
+build/
+dist/
+pylsd_nova.egg-info/
+.idea

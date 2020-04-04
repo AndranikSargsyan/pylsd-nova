@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2015-12-19 02:09:53
-# @Author  : Gefu Tang (tanggefu@gmail.com)
-# @Link    : https://github.com/primetang/pylsd
-# @Version : 0.0.1
 
 import ctypes
 import os
@@ -11,20 +7,21 @@ import sys
 
 
 def load_lsd_library():
-
     root_dir = os.path.abspath(os.path.dirname(__file__))
 
     libnames = ['linux/liblsd.so']
     libdir = 'lib'
+
     if sys.platform == 'win32':
         if sys.maxsize > 2 ** 32:
             libnames = ['win32/x64/lsd.dll', 'win32/x64/liblsd.dll']
         else:
             libnames = ['win32/x86/lsd.dll', 'win32/x86/liblsd.dll']
+
     elif sys.platform == 'darwin':
         libnames = ['darwin/liblsd.dylib']
 
-    while root_dir != None:
+    while root_dir is not None:
         for libname in libnames:
             try:
                 lsdlib = ctypes.cdll[os.path.join(root_dir, libdir, libname)]
@@ -41,14 +38,14 @@ def load_lsd_library():
     # a full path as a last resort
     for libname in libnames:
         try:
-            # print "Trying",libname
             lsdlib = ctypes.cdll[libname]
             return lsdlib
-        except:
+        except Exception as e:
             pass
 
     return None
 
+
 lsdlib = load_lsd_library()
-if lsdlib == None:
+if lsdlib is None:
     raise ImportError('Cannot load dynamic library. Did you compile LSD?')
