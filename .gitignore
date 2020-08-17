@@ -2,3 +2,4 @@ build/
 dist/
 pylsd_nova.egg-info/
 .idea
+__pycache__

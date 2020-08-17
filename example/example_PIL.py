@@ -11,7 +11,7 @@ folder, img_name = os.path.split(full_name)
 img = Image.open(full_name)
 img_gray = np.asarray(img.convert('L'))
 
-segments = lsd(img_gray)
+segments = lsd(img_gray, scale=0.5)
 
 draw = ImageDraw.Draw(img)
 for i in range(segments.shape[0]):

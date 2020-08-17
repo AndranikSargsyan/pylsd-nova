@@ -12,7 +12,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='pylsd-nova',
-    version='1.0.0',
+    version='1.2.0',
     author='Andranik Sargsyan',
     author_email='and.sargsyan@yahoo.com',
     description='pylsd-nova is a python binding for LSD - Line Segment Detector',

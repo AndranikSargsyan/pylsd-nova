@@ -11,7 +11,7 @@ folder, img_name = os.path.split(full_name)
 img = cv2.imread(full_name, cv2.IMREAD_COLOR)
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-segments = lsd(img_gray)
+segments = lsd(img_gray, scale=0.5)
 
 for i in range(segments.shape[0]):
     pt1 = (int(segments[i, 0]), int(segments[i, 1]))
