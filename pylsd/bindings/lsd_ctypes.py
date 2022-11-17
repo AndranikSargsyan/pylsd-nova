@@ -4,7 +4,7 @@
 import ctypes
 import os
 import sys
-
+import platform
 
 def load_lsd_library():
     root_dir = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +19,10 @@ def load_lsd_library():
             libnames = ['win32/x86/lsd.dll', 'win32/x86/liblsd.dll']
 
     elif sys.platform == 'darwin':
-        libnames = ['darwin/liblsd.dylib']
+        if platform.processor() == 'arm':
+            libnames = ['darwin/arm64/liblsd.dylib']
+        else:
+            libnames = ['darwin/x64/liblsd.dylib']
 
     while root_dir is not None:
         for libname in libnames:
