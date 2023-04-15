@@ -24,7 +24,8 @@ setup(
     packages=['pylsd', 'pylsd.bindings', 'pylsd.lib'],
     package_dir={'pylsd.lib': 'pylsd/lib'},
     package_data={'pylsd.lib': [
-        'darwin/*.dylib',
+        'darwin/arm64/*.dylib',
+        'darwin/x64/*.dylib',
         'win32/x86/*.dll',
         'win32/x64/*.dll',
         'linux/*.so'
