@@ -397,6 +397,16 @@ void free_image_double(image_double i)
 }
 
 /*----------------------------------------------------------------------------*/
+/** Free memory used in image_double 'i'. This function does not free the image data.
+ */
+void free_image_from_data_double(image_double i)
+{
+    if ( i == NULL )
+        error("free_image_from_data_double: invalid input image.");
+    free( (void *) i );
+}
+
+/*----------------------------------------------------------------------------*/
 /** Create a new image_double of size 'xsize' times 'ysize'.
  */
 image_double new_image_double(unsigned int xsize, unsigned int ysize)
@@ -432,6 +442,29 @@ image_double new_image_double_ini( unsigned int xsize, unsigned int ysize,
 
     /* initialize */
     for (i = 0; i < N; i++) image->data[i] = fill_value;
+
+    return image;
+}
+
+/*----------------------------------------------------------------------------*/
+/** Create a new image_double of size 'xsize' times 'ysize' using existing 'data'.
+ */
+image_double new_image_from_data_double(double *data, unsigned int xsize, unsigned int ysize)
+{
+    image_double image;
+
+    /* check parameters */
+    if ( xsize == 0 || ysize == 0 ) error("new_image_double: invalid image size.");
+
+    /* get memory */
+    image = (image_double) malloc( sizeof(struct image_double_s) );
+    if ( image == NULL ) error("not enough memory.");
+
+    image->data = data;
+
+    /* set image size */
+    image->xsize = xsize;
+    image->ysize = ysize;
 
     return image;
 }
@@ -2112,10 +2145,10 @@ void writeNtl(ntuple_list ntl, char* file)
 void lsdGet(double* src, int rows, int cols, char* file, double scale,
             double sigma_scale, double ang_th, double quant, double eps,
             double density_th, int n_bins, double max_grad) {
-    image_double image = new_image_double(cols, rows);
-    image->data = src;
+    image_double image = new_image_from_data_double(src, cols, rows);
     ntuple_list ntl = lsd_scale(image, scale, sigma_scale, ang_th, quant, eps,
                       density_th, n_bins, max_grad);
     writeNtl(ntl, file);
     free_ntuple_list(ntl);
+    free_image_from_data_double(image);
 }
