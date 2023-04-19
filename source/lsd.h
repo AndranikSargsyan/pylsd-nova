@@ -147,9 +147,12 @@ typedef struct image_double_s
 } *image_double;
 
 void free_image_double(image_double i);
+void free_image_from_data_double(image_double i);
 image_double new_image_double(unsigned int xsize, unsigned int ysize);
 image_double new_image_double_ini( unsigned int xsize, unsigned int ysize,
                                    double fill_value );
+image_double new_image_from_data_double(double *data, unsigned int xsize,
+                                   unsigned int ysize);
 
 
 /*----------------------------------------------------------------------------*/
